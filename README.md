@@ -4,6 +4,8 @@
 ออกแบบมาเพื่อให้อาจารย์และนักศึกษามองเห็นภาพรวมวันสอบของทุกคลาส เพื่อลดการชนกันของตารางสอบ และช่วยเลือกวันที่เหมาะสมที่สุด
 
 ระบบนี้มาพร้อมตัวดึงข้อมูล (Scraper) ที่ทำการนำเข้าข้อมูลรายวิชาและตารางสอบจากเว็บไซต์สำนักทะเบียนอัตโนมัติ
+# Frontend repository: https://github.com/Maimeetang/exam-shedoo-frontend.git
+# Backend repository: https://github.com/NokiaTh131/exam-shedoo-backend.git
 
 ---
 
