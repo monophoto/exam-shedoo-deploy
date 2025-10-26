@@ -3,7 +3,7 @@ name: exam-shedoo
 services:
   backend:
     image: nokiath131/shedoo-backend:latest
-    platform: linux/amd64
+    #platform: linux/amd64   #uncoment this line if you run on Mac Apple Silicon
     container_name: backend
     restart: unless-stopped
     ports:
@@ -36,7 +36,7 @@ services:
 
   frontend:
     container_name: frontend
-    platform: linux/amd64
+    #platform: linux/amd64     #uncoment this line if you run on Mac Apple Silicon
     restart: unless-stopped
     image: maimeetang/shedoo-frontend:latest
     ports:
@@ -75,7 +75,7 @@ services:
 
   course_scraper:
     image: nokiath131/shedoo-course-scraper:latest
-    platform: linux/amd64
+    #platform: linux/amd64     #uncoment this line if you run on Mac Apple Silicon
     environment:
       POSTGRES_DATABASE: ${POSTGRES_DATABASE}
       POSTGRES_USERNAME: ${POSTGRES_USERNAME}
@@ -91,7 +91,7 @@ services:
 
   exam_scraper:
     image: nokiath131/shedoo-exam-scraper:latest
-    platform: linux/amd64
+    #platform: linux/amd64      #uncoment this line if you run on Mac Apple Silicon
     environment:
       POSTGRES_DATABASE: ${POSTGRES_DATABASE}
       POSTGRES_USERNAME: ${POSTGRES_USERNAME}
