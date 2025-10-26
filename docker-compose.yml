@@ -1,0 +1,114 @@
+name: exam-shedoo
+
+services:
+  backend:
+    image: nokiath131/shedoo-backend:latest
+    platform: linux/amd64
+    container_name: backend
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    depends_on:
+      - psql_prod
+      - redis_prod
+    environment:
+      ADMIN_ACCOUNT: ${ADMIN_ACCOUNT}
+      PORT: 8080
+      POSTGRES_HOST: ${POSTGRES_HOST}
+      POSTGRES_PORT: ${POSTGRES_PORT}
+      POSTGRES_DATABASE: ${POSTGRES_DATABASE}
+      POSTGRES_USERNAME: ${POSTGRES_USERNAME}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      REDIS_ADDR: ${REDIS_ADDR}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      CMU_ENTRAID_GET_TOKEN_URL: ${CMU_ENTRAID_GET_TOKEN_URL}
+      CMU_ENTRAID_CLIENT_ID: ${CMU_ENTRAID_CLIENT_ID}
+      CMU_ENTRAID_CLIENT_SECRET: ${CMU_ENTRAID_CLIENT_SECRET}
+      CMU_ENTRAID_REDIRECT_URL: ${CMU_ENTRAID_REDIRECT_URL}
+      SCOPE: ${SCOPE}
+      CMU_ENTRAID_GET_BASIC_INFO: ${CMU_ENTRAID_GET_BASIC_INFO}
+      CMU_ENTRAID_URL: ${CMU_ENTRAID_URL}
+      JWT_SECRET: ${JWT_SECRET}
+      PROD: ${PROD}
+      COOKIE_DOMAIN: ${COOKIE_DOMAIN}
+    networks:
+      - shedoo_network
+
+  frontend:
+    container_name: frontend
+    platform: linux/amd64
+    restart: unless-stopped
+    image: maimeetang/shedoo-frontend:latest
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - shedoo_network
+
+  psql_prod:
+    image: postgres:latest
+    container_name: shedoo-postgres-prod
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DATABASE}
+      POSTGRES_USER: ${POSTGRES_USERNAME}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    volumes:
+      - psql_volume_prod:/var/lib/postgresql/data
+    networks:
+      - shedoo_network
+
+  redis_prod:
+    image: redis:alpine
+    container_name: shedoo-redis-prod
+    restart: unless-stopped
+    command: redis-server --save 20 1 --loglevel warning --requirepass ${REDIS_PASSWORD}
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_volume_prod:/data
+    networks:
+      - shedoo_network
+
+  course_scraper:
+    image: nokiath131/shedoo-course-scraper:latest
+    platform: linux/amd64
+    environment:
+      POSTGRES_DATABASE: ${POSTGRES_DATABASE}
+      POSTGRES_USERNAME: ${POSTGRES_USERNAME}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_HOST: ${POSTGRES_HOST}
+      POSTGRES_PORT: ${POSTGRES_PORT}
+    depends_on:
+      - psql_prod
+      - backend
+    restart: unless-stopped
+    networks:
+      - shedoo_network
+
+  exam_scraper:
+    image: nokiath131/shedoo-exam-scraper:latest
+    platform: linux/amd64
+    environment:
+      POSTGRES_DATABASE: ${POSTGRES_DATABASE}
+      POSTGRES_USERNAME: ${POSTGRES_USERNAME}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_HOST: ${POSTGRES_HOST}
+      POSTGRES_PORT: ${POSTGRES_PORT}
+    depends_on:
+      - psql_prod
+      - backend
+    restart: unless-stopped
+    networks:
+      - shedoo_network
+
+volumes:
+  psql_volume_prod:
+  redis_volume_prod:
+
+networks:
+  shedoo_network:
+    driver: bridge
